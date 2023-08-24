@@ -1,0 +1,6 @@
+
+-- system 관리자계정에서 작업할 것
+
+create user workshop identified by workshop;
+
+grant resource, connect to workshop;

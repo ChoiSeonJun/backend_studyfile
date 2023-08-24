@@ -1,0 +1,197 @@
+
+
+# 1. 선택자1-기본 및 계층
+<div>
+    <p class="y">셀렉터</p>
+    <a href="http://naver.com" class="y">naver</a><br/>
+    <a href="https://daum.net" class="y">daum</a><br/>
+    <a href="https://google.com" class="z">google</a><br/>
+    <p>
+      <a href="#" id="x">자손</a>
+    </p>
+    <p>
+      <span><a href="xxx">자손2</a></span>
+    </p>
+</div>
+
+
+
+# 2. Filter1-기본 및 child
+<input type="text" value="one">
+<input type="text" value="two">
+<input type="text" value="three">
+<ul>
+	<li>a</li>
+	<li>b</li>
+	<li>c</li>
+	<li>d</li>
+	<li>e</li>
+	<li>f</li>
+</ul>
+<table border="1">
+			<tr>
+				<td>#1</td>
+				<td>#2</td>
+				<td>#3</td>
+				<td>#4</td>
+				<td>#5</td>
+			</tr>
+			<tr>
+				<td>#6</td>
+				<td>#7</td>
+				<td>#8</td>
+				<td>#9</td>
+				<td>#10</td>
+			</tr>
+			<tr>
+				<td>#11</td>
+				<td>#12</td>
+				<td>#13</td>
+				<td>#14</td>
+				<td>#15</td>
+			</tr>
+</table>	
+
+
+
+# 2. Filter2 - form
+<button>버튼1</button>
+<form>
+<button>버튼2</button>
+<input type="text" name="aaa">
+<input type="text" name="bbb" disabled="disabled">
+<input type="checkbox" name="bbb" value="xxx" checked>
+<input type="checkbox" name="ccc" value="xxx2" checked>
+<select>
+ <option value="1">1</option>
+ <option value="2">2</option>
+ <option value="3">3</option>
+</select>
+</form>	
+
+
+# 2. Filter3 - content
+<div>John Resig</div>
+  <div>George Martin</div>
+  <div>Malcom john Sinclair</div>
+  <div>
+    <p>HiJohn Resig</p>
+  </div>
+
+  <table border="1">
+    <tr><td>TD #0</td><td></td></tr>
+    <tr><td>TD #2</td><td></td></tr>
+    <tr><td></td><td>TD#5</td></tr>
+  </table>
+
+
+
+# 3. 2차 필터링1 - 기본
+<p>text</p>
+<p class="middle">Middle <span>text</span></p>
+<p class="final">final text</p>
+
+<div>
+		<ul>
+			<li>list item 1</li>
+			<li>list item 2</li>
+			<li><span>list item 3</span></li>
+			<li>list item 4</li>
+		</ul>
+</div>
+
+
+# 3. 2차 필터링2 - 계층구조
+<div>
+		<span>this is 1st p</span>
+	</div>
+	<div>
+	  <p>
+		<span>this is 2nd p</span>
+	  </p>	
+	</div>
+	<div class="myClass">
+		<span>this is 3rd p</span>
+	</div>
+
+
+
+# 3. 2차 필터링3 - 형제
+ <ul>
+	<li>A</li>
+	<li class="selected">B</li>
+	<li>C</li>
+	<li class="xxx">D</li>
+	<li>E</li>
+  </ul>
+
+
+
+# 4. attribute 1 - class 속성
+<h1>Heading</h1>
+<h2>Heading2</h2>
+<p>이것은 중요한 내용이다.</p>
+<button id="large">크게보기</button><br>
+<button id="normal">보통</button>
+<hr>
+<button id="toggle">toggle</button>
+<hr/>
+
+
+# 4. attribute 2 - val, text, html, attr
+<button id="get">출력</button>
+<button id="set">설정</button>
+<hr>
+<p>Hello <em>world</em>!!!</p>
+주소:<input type="text" name="userid" id="addr1"><br>
+배송주소<input type="text" name="passwd" id="addr2"><br>
+<a href="http://www.google.com">link</a>
+<div id="result"></div>
+
+
+# 5. manipulation
+<div id="result">
+ <p>Hello</p>
+</div>
+<button id="append">append</button><br>
+<button id="prepend">prepend</button><br>
+<button id="before">before</button><br>
+<button id="after">after</button><br>
+<button id="replaceWith">replaceWith</button><br>
+<button id="remove">remove</button><br>
+<button id="empty">empty</button><br>
+<hr/>s
+
+
+# 6. 유틸리티 1
+var months = [ 'January', 'February', 'March', 'April', 'May',
+			'June', 'July', 'August', 'September', 'October',
+			'November', 'December' ];
+
+# 6. 유틸리티 2
+<ul>
+	<li>100</li>
+	<li>200</li>
+	<li>300</li>
+	<li>400</li>
+	<li>500</li>
+</ul>
+합계:<div id="result"></div>
+
+
+
+# 7. 이벤트
+<button id="ok">OK</button><br>
+text:<input type="text" id="txtInput" /> <br>
+<button id="hover">hover</button><br>
+<form action="http://www.google.com">
+아이디<input type="text" name="userid" id="userid"><br>
+비밀번호<input type="text" name="passwd"><br>
+<select name="fruit">
+ <option value="사과">사과</option>
+ <option value="바나나">바나나</option>
+ <option value="수박">수박</option>
+</select><br>
+ 사과<input type="checkbox" name="checkbox" id="checkbox" checked>
+<input type="submit" value="전송">
+</form>

@@ -1,0 +1,1524 @@
+서블릿/JSP
+
+1. 자바 개발 플랫폼 3종류
+
+   - Java SE
+   - Java EE ( Java Enterprise Edition)
+      ==> 서브릿과 JSP 지원하는 플랫폼
+   - Java ME
+
+2. Tomcat 컨테이너
+
+  기본포트번호: 8080 ==> 8090, 8091 변경필요
+
+  오라클서버내에 tomcat이 설치되어있고 8080 사용한다.
+
+
+3. 이클립스 프로젝트 ( Dynamic web project 선택 )
+ 
+   Context Root: 물리적인 디렉토리에 대한 논리적인 이름. 언제든지 변경이 가능하다.
+                 기본명은 자동으로 Dynamic web project명으로 지정된다.
+                 웹브라우저의 URL에서 사용된다.
+		 http://서버IP:8090/context명/자원(html,jsp,서블릿등)
+
+   Content directory: 이클립스가 인지하는 웹 어플리케이션의 물리적인 디렉토리. ==> WebContent 디렉토리
+
+   web.xml  : 배치지시자 ( deployment descriptor)
+              전체 Dynamic web project의 설정정보 등록
+	      ( 어노테이션(annotation)으로도 가능하다.) 
+
+
+4. 생성된 Dynamic web project 구조
+
+  HelloWeb
+     Java Resources
+           src <=========== *.java 저장
+	   Libraries
+	       Tomcat (servlet-api.jar, jsp-api.jar )
+	       JRE ( rt.jar )
+
+     WebContent  <=== 이클립스가 인지하고 있는 웹 어플리케이션의 물리적인 디렉토리
+                 <== jsp,html,css,js, image 파일에 저장(*****) 
+          WEB-INF <== 웹어플리케이션은 무조건 존재해야 된다. WEB-INF안에 저장된 파일들은 외부에 접근불가
+	     lib  <== 외부 jar 파일 저장 ( ojdbc6_g.jar, mybatis.jar)
+	     web.xml  <==== 전체 Dynamic web project의 설정정보 등록
+
+
+
+
+
+* 실습순서
+1. Dynamic web project 생성 ( HelloWeb )
+2. WebContent안에 hello.html 작성
+3. Tomcat 서버 실행
+4. 브라우저 열어서 요청
+   http://서버IP:8090/context명/자원
+
+ ==>  http://localhost:8090/HelloWeb/hello.html
+
+
+5. 클라이언트에서 요청하는 URL 경로 문법 (******)
+
+    http://서버IP:8090/context명/자원(html,jsp,서블릿등)
+
+   가. html 요청
+     http://서버IP:8090/context명/html파일
+
+	         1)요청          tomcat서버  2)hello.html검색
+	 브라우저 ----------->     hello.html
+               <----------
+                 3)응답(hello.html)
+
+   나. jsp 요청
+     - html과 동일한 경로에 저장한다.
+     - 3단계로 동작됨 ( 변환 --> 컴파일 -->실행 )
+        C:\servlet_study\apache-tomcat-9.0.76\work\Catalina\localhost\xxx\org\apache\jsp
+     - 요청방식도 동일하다.
+     http://서버IP:8090/context명/jsp파일
+
+
+               1)요청          tomcat서버  2)world.jsp검색 
+	 브라우저 ----------->  world.jsp 3) jsp-->java 변환 (world.jsp--> world_jsp.java)
+                                       4) 컴파일  ( world_jsp.java --> world_jsp.class )
+				       5) 클래스파일 실행(****) ==> 실행결과는 html
+               <----------
+                6)응답(실행결과 html)
+
+     - jsp는 실행되기 때문에 에러 발생될 수 있다. ( *.java 에서만 에러가 발생되는 것이 아니다. )
+
+
+   다. 서블릿 요청
+      - src 저장
+      - html과 jsp와 요청방식이 다르다. (******)
+
+       old방식:
+          http://서버IP:8090/context명/servlet/패키지포함된서블릿명
+
+	  ==> http://localhost:8090/xxx/servlet/com.servlet.HelloServlet
+
+          ==> 중요한 2가지 이슈때문에 현재 사용 불가
+	      - 너무 길다.
+	      - 보안 이슈
+
+       최신방식:
+           servlet/com.servlet.HelloServlet ==> 별칭지정 (서블릿맵핑, url매핑 )
+
+          http://서버IP:8090/context명/서블릿맵핑명 (***********************)
+
+	  ==> http://localhost:8090/xxx/hello
+
+	 
+	 ==>서블릿 맵핑정보 설정 2가지 방법
+	   가. web.xml 설정 ==> 스프링 프레임워크의 서블릿맵핑 방식이다.
+	        <!-- 서블릿 매핑 Servers의 web.xml 참조 110라인 433라인-->
+		   <servlet>
+			<servlet-name>서블릿맵핑명</servlet-name>
+			<servlet-class>패키지명으로 포함한 서블릿명</servlet-class>
+		   </servlet>     
+		   <servlet-mapping>
+			<servlet-name>서블릿맵핑명</servlet-name>
+			<url-pattern>/서블릿맵핑명</url-pattern>
+		    </servlet-mapping>
+
+	   나. @WebServlet("/서블릿맵핑명")- 기본
+##############################################
+리뷰
+1) 자바기반의 웹어플리케이션 개발 ==> Tomcat 컨테이너 ( 서블릿과 JSP를 생성~소멸 관리 ), 버전 주의
+2) Tomcat의 배포 경로(deploy path)인 webapps에 생성된 웹 어플리케이션(물리적인 디렉토리)과
+   웹 브라우저에서 URL로 요청하는 컨텍스트명(논리적인 이름) 관계 정리.
+   논리적인이름과 물리적인 디렉토리 맵핑 정보는 server.xml 에 등록되어 있다.
+
+3) 서블릿 작성후에는 반드시 서블릿 맵핑(servlet mapping, url mapping) 해야 된다.
+   - web.xml 
+   - @WebServlet("/서블릿맵핑")
+
+4) 요청 URL 방법
+    - html :  http://localhost:8090/컨텍스트명/hello.html
+    - jsp  :  http://localhost:8090/컨텍스트명/world.jsp
+    - 서블릿 :  http://localhost:8090/컨텍스트명/서블릿맵핑명
+
+##############################################
+서블릿(servlet)
+
+1. 서블릿 특징
+  - main 없다. 요청한 서블릿이 시작점 역할 담당.
+  - Tomcat 컨테이너가 관리(생성~소멸).
+  - 응답결과는 html이기 때문에 html응답코드가 필요.
+
+2. 구현 방법
+  가. 반드시 package 필수
+  나. extends HttpServlet  ( javax.servlet.http.HttpServlet )
+     - 추상 클래스 
+     - 계층구조 ( 외우기, p35 참조 )
+
+          Servlet(인터페이스): init(), service(), destroy()  ||    ServletConfig(인터페이스): getServletContext(),getInitParameter()
+               |                                                 |
+	  GenericServlet (추상클래스): getInitParameter(), getInitParameterNames(),..
+	       |
+	  HttpServlet (추상클래스): doGet(HttpServletRequest request,
+	                              HttpServletResponse response), 
+	                        doPost()
+	       |
+	       |
+	    사용자서블릿
+
+     * Java EE API 문서
+     https://javaee.github.io/javaee-spec/javadocs/
+
+     * ServletContext (인터페이스, javax.servlet.ServletContext )
+      ==> ServletConfig의 getServletContext() 메서드를 사용해서 
+          ServletContext를 얻는다.
+	 예> 사용자 서블릿에서
+	   ServletContext sc = getServletContext();
+       * 메서드
+          -getInitParameter()
+	  -setAttribute(), getAttribute(), removeAttribute()
+	  ...
+
+     * HttpServletRequest ( 인터페이스,  javax.servlet.http.HttpServletRequest)
+       --> 요청과 관련
+                   
+		     요청
+	   브라우저 --------------------> 서블릿
+
+       --> 요청시 사용할 수 있는 다양한 메서드를 제공 
+           예> 사용자가 입력한 데이터 얻기,한글처리...
+	 * 메서드    
+	  - getContextPath() : URL에서 context명 추출
+	  - getCookies(): Cookie 정보를 얻을때
+          - getHeader(String name), getHeaderNames() : 요청 헤더 정보 얻을 때
+	  - getSession() : HttpSession 정보를 얻을 때
+          - getAttribute(),setAttribute(),removeAttribute()
+          - setCharacterEncoding() : 한글 처리
+          - getRequestDispatcher(): 포워드(forward) 용도
+  
+     * HttpServletResponse ( 인터페이스,  javax.servlet.http.HttpServletResponse) 
+       --> 응답과 관련
+    
+	   브라우저 --------------------> 서블릿
+                 <------------------- 
+		      응답
+
+      --> 응답시 사용할 수 있는 다양한 메서드를 제공 
+           예> html 응답처리, MIME타입(서버에서 브라우저에게 데이터 전달시 데이터 종류지정)...
+
+         * 메서드
+           - addCookie(): Cookie 생성할 때
+           - getHeader(), getHeaderNames() : 응답 헤더 정보 얻을 때
+	   - sendRedirect(): 리다이렉트(redirect) 용도
+	   - setContentType(): MIME타입 지정
+	   - getWriter(): html를 브라우저에 출력하기 위해서 I/O 얻는 용도
+
+  다. 기본생성자 필수
+  라. 서비스 메서드 재정의 ( doGet, doPost )
+    
+     - doGet(HttpServletRequest request, HttpServletResponse response): 기본
+     - doPost(HttpServletRequest request, HttpServletResponse response)
+
+  마. 서블릿맵핑(servlet mapping, URL mapping )
+    - web.xml
+    - @WebServlet("/서블릿맵핑") - 기본
+
+#######################################################################
+서블릿 lifecycle
+1) tomcat 컨테이너가 서블릿의 life cycle 관리( 생성 ~ 소멸 )
+2) 생성시 호출 메서드: init()
+   요청시 호출 메서드: 서비스 메서드(doGet, doPost)
+   삭제시 호출 메서드: destroy()
+ ==> 콜백 메서드로 동작됨 ( 시스템이 특정 상황에서 호출한다. )
+  
+3) 결론
+  - 서블릿은 단 한번만 생성된다.(매우 중요)
+    단 하나의 생성된 서블릿을 이용해서 많은 사용자(클라이언트)의 요청을 처리한다.
+
+4) 주의할 점
+  - 인스턴스 변수는 단 한번만 생성된다. 여러 사용자가 공유할 수 있다. ( thread-unsafe )
+    만약에 공유하고 싶지 않으면 반드시 로컬 변수로 작성해야 된다. ( thread-safe )
+
+ 결론은 서블릿 코드 구현은 thread-safe하게 구현해야 된다.
+#########################################################
+서블릿의 핵심 기능
+1) 요청처리 기능
+
+2) 응답처리 기능 ( 교안 p41 )
+   - html 작성해서 웹 브라우저로 전송하는 기능
+   - doGet(   request, HttpServletResponse response){}
+     의 HttpServletResponse 담당한다.
+   - 처리 순서
+    가. MIME 타입 설정 : ((Multipurpose Internet Mail Extensions)
+                   : 웹 브라우저에게 처리할 데이터 종류 지정하는 방법
+       response.setContentType("MIME타입");
+
+       * MIME 타입 확인 방법 ( Servers 폴더의 web.xml 644라인부터 )
+         - text/plain: 기본, 일반 문자열로 처리
+	 - text/html :  html로 처리
+         - text/html;charset=utf-8 : html 처리 및 한글처리
+
+         response.setContentType("text/html;charset=utf-8");
+
+        * MIME타입 지정시 주의할점
+	 ==> 값을 잘못 지정하면 (예> "test/html") 
+	    웹브라우저가 처리를 못하기 때문에 다운로드해서 사용자에게 처리하도록 유도.
+
+    나. 데이터를 전달하기 위한 java I/O 얻기 ( Input/Output, 읽기/쓰기 )
+       import java.io.PrintWriter;
+
+       PrintWriter out = response.getWriter();
+
+    다. 데이터 출력
+        out.print("html코드");
+#########################################################
+서블릿의 요청처리 기능
+
+- 실행순서
+
+ 가. 사용자 입력 태그를 가진 html(jsp) 작성
+    - loginForm.jsp
+    - <form action="서블릿맵핑"  method="get|post">
+
+ 나. 사용자 입력 값을 얻기 위한 서블릿 작성
+    - LoginServlet ( 서블릿맵핑: /login )
+    - method="get" ==> doGet 으로 처리
+      method="post" ==> doPost 으로 처리 
+      만약 일치하지 않으면 405 에러가 발생됨.
+
+   * 메서드 이용
+    a) String s = request.getParameter("tag의 name값");
+     만약에 일치하는 name이 없으면 null 반환된다.
+     GET 방식으로 요청한 경우에는 한글이 안 깨짐. (post는 한글 깨짐)
+
+     POSt 방식의 한글처리는 request.setCharacterEncoding("utf-8"); 사용한다.
+
+    b) String [] arr = request.getParameterValues("tag의 name값");
+       - checkbox 주로 사용됨.
+#########################################################################
+경로(path)
+ - 특정 타겟(서블릿,jsp,html,css파일,js파일, image등)의 경로지정하는 방법.
+ - html 경우:
+    예> <a href="타겟경로">
+       <img src="타겟경로">
+       <script src="타겟경로">
+       <link  href="타겟경로">
+       <form action="타겟경로">
+   js 경우 :
+        location.href="타겟경로"
+
+가. 절대 경로 ( absolute path)
+   - 절대적인 기준으로 타겟의 경로가 결정됨.
+   - / 시작됨. ==> /컨텍스트명 기준으로 해서 타겟 경로를 찾는다.
+    예> http://localhost:8090/컨텍스트명/자원(html,jsp,서블릿맵핑명)
+
+    현재: http://localhost:8090/01_servlet2/hello.html
+
+        <a href="/01_servlet2/world.html">world.html</a>
+    타겟: http://localhost:8090/01_servlet2/world.html
+
+        <a href="/01_servlet2/aaa/happy.html">happy.html</a>
+    타겟: http://localhost:8090/01_servlet2/aaa/happy.html
+
+    ##########################################
+    현재: http://localhost:8090/01_servlet2/bbb/hello.html
+
+        <a href="/01_servlet2/world.html">world.html</a>
+    타겟: http://localhost:8090/01_servlet2/world.html
+
+
+
+나. 상대 경로 ( relative path)
+   - 기준은 현재 컴포넌트의 url 기준
+   - . (현재 디렉토리)
+     ..(부모 디렉토리)
+
+   예>
+      A -------------> B
+
+      A기준으로 B의 경로가 결정됨.
+     예> http://localhost:8090/컨텍스트명/자원(html,jsp,서블릿맵핑명)
+
+    현재: http://localhost:8090/01_servlet2/hello.html
+
+        <a href="world.html">world.html</a>
+    타겟: http://localhost:8090/01_servlet2/world.html
+
+        <a href="aaa/happy.html">happy.html</a>
+    타겟: http://localhost:8090/01_servlet2/aaa/happy.html
+
+    ##########################################
+    현재: http://localhost:8090/01_servlet2/bbb/hello2.html
+
+        <a href="../world.html">world.html</a>
+    타겟: http://localhost:8090/01_servlet2/world.html
+
+##############################################
+리뷰
+1) 3가지 컴포넌트 요청 방법
+
+   html :     http://localhost:8090/컨텍스트명/html파일
+              http://localhost:8090/컨텍스트명/디렉터리/html파일 
+
+   jsp :      http://localhost:8090/컨텍스트명/jsp파일
+              http://localhost:8090/컨텍스트명/디렉터리/jsp파일
+
+   servlet :  http://localhost:8090/컨텍스트명/서블릿맵핑명
+
+2) 서블릿(servlet) 계층구조
+
+      Servlet(인터페이스)     ServletConfig(인터페이스):getServletContext(), getInitParameter()
+          |                    |
+      GenericServlet (추상클래스)
+          |
+      HttpServlet (추상클래스): doGet, doPost
+          |
+      사용자 서블릿 
+
+
+      // 인터페이스
+      ServletContext sc = getServletContext();
+
+3) 서블릿 작성 방법
+  가. 반드시 패키지
+  나. extends HttpServlet
+  다. 기본생성자
+  라. 서비스 메서드 구현
+     doGet(HttpServletRequest request, HttpServletResponse response){}
+     doPost(HttpServletRequest request, HttpServletResponse response){
+       doGet(request, response);
+     }
+  마. 서블릿맵핑
+    - web.xml
+    - @WebServlet("/서블릿맵핑")
+  
+ 요청방식:
+  http://localhost:8090/컨텍스트명/서블릿맵핑명
+
+4) 서블릿의 주요 기능
+                요청
+    브라우저 -------------------> 서블릿
+          <------------------ 
+	        응답
+
+ 가. 요청 처리
+   - HttpServletRequest 담당
+   - 종류? 
+       a. 사용자 입력 데이터 얻기
+          String s = request.getParameter("tag name값");
+          String [] arr = request.getParameterValues("tag name값"); // checkbox
+
+          request.getParameterNames(); // tag name 값 얻기
+	  request.getParameterMap();   // <name값, value값>
+       
+       b. POST 방식의 한글 처리
+          request.setCharacterEncoding("utf-8");
+
+ 나. 응답 처리
+   - HttpServletResponse 담당
+   - 종류 ?
+      a. html 작성해서 클라이언트에게 전달
+          
+	   response.setContentType("text/html;charset=UTF-8");
+	   PrintWriter out = response.getWriter();
+	   out.print("html코드작성");
+
+
+5) 서블릿의 LifeCycle
+  - 생성: init() 메서드 콜백 호출, 단 한번만 호출된다.
+  - 요청: 서비스 메서드(doGet/doPost) 콜백 호출, 요청할 때마다 호출된다.
+  - 삭제: destory() 메서드 콜백 호출, 단 한번만 호출된다.
+
+  주요한 특징은 서블릿은 단 한번만 생성된다.
+  단 하나의 서블릿으로 여러 사용자(클라이언트)에게 요청 및 응답처리 해준다.
+
+6) 경로(path)
+  가. 상대 경로
+     - 기준은 현재 요청한 컴포넌트(html,jsp,서블릿) 기준
+     - . 또는 .. 같이 사용될 수 있다.
+
+  나. 절대 경로
+     - 기준은  ~:8090/ 의 /부터.
+     - 반드시 /컨텍스트명 로 시작된다.
+##############################################################
+java.util.Enumeration ( java.util.Iterator 동일한 기능 담당 )
+
+      Enumeration<String> enu = request.getParameterNames();
+      while(enu.hasMoreElements()){
+           s.o.p(ite.nextElement());
+      }
+   
+
+ - java.util.Iterator 사용
+       Iterator<String> ite = list.iterator();
+       while(ite.hasNext()){
+          s.o.p(ite.next());
+       }
+   
+##############################################################
+ServletConfig  vs  ServletContext
+
+1. javax.servlet.ServletConfig
+  - 서블릿 계층구조에서 본 것 처럼 서블릿에 1:1 대응됨. ( 서블릿당 하나씩 생성 )
+  - 다른 서블릿에서는 사용 불가
+  - 기능?
+     a. 초기화 파라미터 조회 ( key/value 쌍 )
+       String s =  getInitParameter(String name); 사용
+       ==> web.xml에 서블릿을 맵핑할 때 key/value 쌍으로 값을 저장하고
+           필요시 사용
+       ==> key/value 쌍을 자바에 저장하면 수정시 재컴파일이 필요함.
+       ==> 대표적인 예> 파일경로
+       ==> 스프링프레임워크에서 사용한다.
+       
+         <servlet>
+            <servlet-name>
+            <servlet-class>A
+	    <init-param>
+               <param-name>dir_path</param-name>
+	       <param-value>c:\temp</param-value>
+	    </init-param>
+	    <init-param>
+               <param-name>x</param-name>
+	       <param-value>y</param-value>
+	    </init-param>
+	 </servlet>
+
+         <servlet>
+            <servlet-name>
+            <servlet-class>B
+
+      b. ServletContext 반환
+        ServletContext ctx =  getServletContext();
+
+
+2. javax.servlet.ServletContext
+  - web application(논리적인명: 컨텍스트명)당 한개만 생성.
+  - 모든 서블릿에서 사용 가능.
+  - 기능?
+     a. 컨텍스트 파라미터 조회 ( key/value 쌍 )
+
+        ServletContext ctx =  getServletContext();
+	String s =  ctx.getInitParameter(String name); 사용
+
+       ==> web.xml에  key/value 쌍으로 값을 저장하고
+           필요시 사용
+       ==> key/value 쌍을 자바에 저장하면 수정시 재컴파일이 필요함.
+       ==> 대표적인 예> 파일경로
+       ==> 스프링프레임워크에서 사용한다.
+       ==> 여러 서블릿이 사용 가능하다. ( 공유 가능 )
+
+        <!-- ServletContext의 getInitParameter() 사용, 모든 서블릿이 사용 가능 -->
+        <context-param>
+               <param-name>dir_path</param-name>
+	       <param-value>c:\temp</param-value>
+	</context-param>
+
+	<servlet>
+            <servlet-name>
+            <servlet-class>A
+	    <!-- ServletConfig의 getInitParameter() 사용, A 서블릿만 사용 가능 -->
+            <init-param>
+               <param-name>dir_path</param-name>
+	       <param-value>c:\temp</param-value>
+	    </init-param>
+
+        <servlet>
+            <servlet-name>
+#########################################
+Scope ( 범위, lifecycle )
+
+1)개요
+   - 임의의 데이터를 특정 객체에 저장할 수 있다.
+   - 객체가 3가지 형태가 있고 lifecycle가 다르다.(중요)
+ 
+2) 종류 3가지
+
+  가. HttpServletRequest ( request scope 라고 부른다. )
+        // Attributes are reset between requests
+	// request.getParameter(key)  구별해야 된다.
+       -저장방법:  request.setAttribute(String key, Object value);
+       -조회:     request.getAttribute(key); 형변환 필요
+       -삭제:     request.removeAttribute(key);
+
+  나. HttpSession  ( session scope 라고 부른다. )
+
+      HttpSession session = request.getSession();
+       -저장방법:   session.setAttribute(String key, Object value);
+       -조회:     session.getAttribute(key); 형변환 필요
+       -삭제:     session.removeAttribute(key);
+
+  다. ServletContext ( application scope 라고 부른다. )
+
+        ServletContext ctx = getServletContext();
+       -저장방법:   ctx.setAttribute(String key, Object value);
+       -조회:     ctx.getAttribute(key); 형변환 필요
+       -삭제:     ctx.removeAttribute(key);
+
+
+3) ServletContext
+  - Web Application 관련
+  - 생성: Web Application이 생성될 때 ( tomcat이 서비스할 준비가 될 때)
+     ~
+    소멸: Web Application이 종료될 때 ( tomcat 종료시, 또는 module 제거시 )
+  - 용도: Web Application이 종료되기 전까지 계속적으로 사용하는 데이터 필요시
+
+4) HttpSession
+  - 웹 브라우저와 관련
+  - 생성: 웹 브라우저 열고 요청할 때
+    ~
+    소멸: 웹 브라우저 close 될 때 ( tomcat 기준으로 실제로는 30분 지나면 제거됨. 보안이슈 )
+   - 용도: 브라우저가 종료되기 전까지 계속적으로 사용하는 데이터 필요시
+
+    * Servers의 web.xml 631 라인 참조해서 세션 time-out 변경 가능
+    <session-config>
+        <session-timeout>30</session-timeout>
+    </session-config>
+
+5) HttpServletRequest
+  - 요청과 관련
+  - 생성: 서블릿(JSP) 요청할 때
+    ~
+    소멸: 요청에 응답시 
+  - 용도: 요청 ~ 응답 범위에 사용하는 데이터 필요시
+ ####################################
+Filter API 활용
+1) 용도
+   - 서블릿 호출전(요청필터) 또는 호출후(응답필터)에 특별한 작업이 가능.
+   - 요청필터는 일반적으로 POST의 한글처리가 대표적인 작업이고
+     응답필터는 특별히 없는데 압축,암호화 작업이 가능하다.
+2) 구현
+  가. 패키지
+  나. implements Filter
+  다. doFilter( request, response, FilterChain chain){
+       //요청필터 작업
+       chain.doFilter(request, response);
+       //응답필터 작업
+     }
+  라. 필터맵핑 ( web.xml )
+   <filter>
+        <filter-name>MyFilter</filter-name>
+        <filter-class>com.filter.MyFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>MyFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+
+##########################################################\
+리뷰
+1. 요청 파라미터 값 얻기
+            
+	      요청 (HttpServletRequest request)
+   브라우저 ------------------> 서블릿
+
+   String s = request.getParameter(name);
+   String [] arr = request.getParameterValues(name);
+   Enumeration<String> enu = request.getParameterNames(); // name 반환
+   while(enu.hasMoreElements()){
+       String name = enu.nextElement();
+       String value= request.getParameter(name);
+   }
+  
+   Map<String, String[]> map = request.getParameterMap();
+
+2. 서블릿 계층구조
+  
+     Servlet(인터페이스) ServletConfig(인터페이스)
+        |
+     GenericServlet (추상클래스)
+        |
+     HttpServlet(추상클래스)
+        |
+     사용자 서블릿
+3. ServletConfig
+   - 서블릿당 하나씩 생성됨.
+   - 역할:
+       가. 초기화 파라미터 ( initialization parameter )
+            <servlet>
+	        ..
+                <init-param>
+		   <param-name>key
+		   <param-value>value
+		</init-param>
+	    </servlet>
+         getInitParameter(key) 이용, 특정 서블릿만 사용 가능.
+       나. ServletContext 반환
+         ServletContext ctx = getServletContext();
+
+4. ServletContext
+   - 웹어플리케이션당 하나씩 생성됨.
+   - 역할:
+       가. 컨텍스트 파라미터 ( context-wide initialization parameter )
+                <context-param>
+		   <param-name>key
+		   <param-value>value
+		</context-param>
+              <servlet>
+         ServletContext ctx = getServletContext();
+	 ctx.getInitParameter(key) 이용, 모든 서블릿이 사용 가능.
+
+        나. 데이터 저장 ( application scope )
+	 ServletContext ctx = getServletContext();
+	 ctx.setAttribute(String key,Object obj);
+	 ctx.getAttribute(key);
+	 ctx.removeAttribute(key);
+        
+	웹어플리케이션이 종료되지 않는한 (tomcat 종료되지 않는한) 데이터 사용이 가능하다.
+
+5. scope (범위)
+  
+  가. request scope
+     범위: 요청~응답
+     API: HttpServletRequest
+     기능: request.setAttribute(String key,Object obj);
+	 request.getAttribute(key);
+	 request.removeAttribute(key);
+
+  나. session scope
+     범위: 웹브라우저 open후 요청 ~ 웹브라우저 close
+     API: HttpSession
+     기능: 
+         HttpSession session = request.getSession();
+	 session.setAttribute(String key,Object obj);
+	 session.getAttribute(key);
+	 session.removeAttribute(key);
+
+  다. application scope
+     범위: 웹어플리케이션 생성 ~  웹어플리케이션 삭제(tomcat shutdown)
+     API: ServletContext
+     기능: ServletContext ctx = getServletContext();
+         ctx.setAttribute(String key,Object obj);
+	 ctx.getAttribute(key);
+	 ctx.removeAttribute(key);  
+
+
+6. 필터(filter)
+  가. 개요
+    브라우저 -------필터---> 서블릿
+          <------필터----
+  나. 구현
+     - implments Filter
+     - doFilter(request, response , FilterChain chain){
+          request.setCharacterEncoding("utf-8");
+	  chain.doFilter(request, response);
+       }
+     - web.xml 필터매핑
+       // 8090/xxx/test 요청시 필터가 적용됨.
+       <url-pattern>/test</url-pattern>
+
+       // 8090/xxx/exam 요청시 필터가 적용됨.
+       <url-pattern>/exam</url-pattern>
+   
+       // 8090/xxx/임의값    요청시 필터가 적용됨.
+       <url-pattern>/*</url-pattern>
+  다. 용도
+      - POST 한글처리시 ( 스프링 프레임워크에서 사용됨 )
+
+##########################################################\
+DB 연동 ( MyBatis 이용 )
+
+1. main 아키텍쳐
+
+  main클래스 -------> 서비스 ---------> DAO ------> 오라클
+                                  DTO
+
+   가. 2개의 jar를 build path
+   나. 2개의 xml 파일 작성 ( com.config 패키지 ) 및 MySqlSessionFactory 작성
+      - Configuration.xml
+      - DeptMapper.xml
+      - MySqlSessionFactory 작성
+   다. com.dto.DeptDTO 작성
+   라. com.dao.DeptDAO 작성
+   마. com.service.DeptService
+      com.service.DeptServiceImpl 작성
+바. DeptMain 작성 ( main 메서드 )
+
+2. web 아키텍쳐
+
+  서블릿 -----------> 서비스 ---------> DAO ------> 오라클
+                                 DTO
+   가. 2개의 jar를 WEB-INF/lib 복사 ==> 자동으로 build path 됨
+  나. 2개의 xml 파일 작성 ( com.config 패키지 ) 및 MySqlSessionFactory 작성
+      - Configuration.xml
+      - DeptMapper.xml
+      - MySqlSessionFactory 작성
+   다. com.dto.DeptDTO 작성
+   라. com.dao.DeptDAO 작성
+   마. com.service.DeptService
+      com.service.DeptServiceImpl 작성
+바. DeptServlet 작성 ( 서블릿 )
+
+##########################################################
+DB 연동하기 위한 4가자 정보 외부파일에 저장
+  가. 현재
+      <dataSource type="POOLED">
+        <property name="driver" value="oracle.jdbc.driver.OracleDriver"/>
+        <property name="url" value="jdbc:oracle:thin:@localhost:1521:xe"/>
+        <property name="username" value="SCOTT"/>
+        <property name="password" value="TIGER"/>
+      </dataSource>
+
+  나. 외부파일로 추출해서 사용 (  com/config/jdbc.properties )
+    -  properties 파일의 특징은 key=value 쌍으로 저장, 주석문은 #,
+       한글은 자동으로 유니코드로 변경됨 \uXXXX.
+       만약에 유니코드로 변경하지 않을려면 저장시 파일타입을 utf-8로 저장하면 된다.
+
+##########################################################
+세션관리(session tracking)
+
+1. 등장배경
+   - http 프로토콜의 connectionLESS, stateLESS 특징으로서
+     각 페이지마다 이전 페이지에서 했던 데이터 및 기능들을 현재 페이지에서 알 수가 없다.
+     ==> 알 수 있도록 처리(세션관리)
+
+2. 2가지 방법
+
+ 가. 세션 이용
+    - HttpSession API 이용
+    - 서버에 데이터를 저장 => setAttribute(key, Object)
+    - 저장되는 데이터는 자바의 모든 데이터가 가능하다.
+    - 웹 브라우저와 동일 lifecycle 갖는다. ( 보안 이슈로 time-out 지원 )
+    - 주요 메서드
+      HttpSession session = request.getSession();
+      session.setAttribute(key, value);
+      session.getAttribute(key);
+      session.removeAttribute(key);
+
+      session.invalidate(); //로그아웃
+      session.setMaxInactiveInterval(second); // time-out
+      session.getId();  // 세션 id값 얻기
+      session.isNew();  // 새로운 세션이냐?
+      session.getCreationTime(); // 세션이 생성된 시간을 long 반환
+      session.getLastAccessedTime(); // 가장 마지막 요청 시간을 long 반환
+ 
+    - 용도: 로그인, 장바구니
+ 
+ 나. 쿠키 이용
+    - Cookie API 이용
+    - 클라이언트(브라우저 또는 PC)에 데이터를 저장
+    - 저장되는 데이터는 문자열만 저장 가능하다.
+    - 도메인(웹사이트)당 300개까지만 저장 가능하다.
+    - setMaxAge(값); 
+       양수: 지정된 양수값만큼 쿠키 정보 유지
+       음수: 브라우저와 동일한 lifecycle
+       0:  쿠키 즉시 삭제
+
+    - 주요 메서드
+       Cookie c = new Cookie(String key, String value);
+       response.addCooke(c); // 생성된 쿠키 저장
+
+       Cookie [] x = request.getCookies(); // 쿠키 조회
+       String key = c.getName();
+       String value = c.getValue();
+
+       c.setMaxAge(값);
+      
+    - 가장 큰단점은 보안 취약, 클라이언트가 쿠키 사용 여부 결정한다.
+    - 용도: 로그인 아이디 저장, 이전에 봤던 상품 목록 보여주기....
+
+##########################################################
+파일 업로드 ( file upload )
+
+1. 파일 업로드 기능을 가진 jar(라이브러리) 활용
+   ==> 가장 안정적이고 많이 사용된 라이브러리는 apache에서 제공된 commons 파일업로드를 사용한다.
+   ==> 아파치 사이트에서 jar 다운로드
+      http://jakarta.apache.org
+      https://commons.apache.org/ 에서 2 개의 jar 다운로드
+
+      Fileupload:commons-fileupload-1.4.jar
+      IO: commons-io-2.13.0.jar
+
+2. 웹 프로젝트에 jar 등록
+  WEB-INF
+     |
+     lib 폴더에 복사한다.
+
+3. 파일업로드 jsp 작성 ( uploadForm.jsp )
+   반드시 다음과 같이 설정해야 된다.
+   <form method="POST" enctype="multipart/form-data">
+ 
+4. 서블릿 작성 ( UploadServlet.java)
+
+  가. https://commons.apache.org/proper/commons-fileupload/using.html
+     The simplest case 내용 복사
+// Create a factory for disk-based file items
+DiskFileItemFactory factory = new DiskFileItemFactory();
+
+// Configure a repository (to ensure a secure temp location is used)
+ServletContext servletContext = this.getServletConfig().getServletContext();
+File repository = (File) servletContext.getAttribute("jakarta.servlet.context.tempdir"); // Or "javax.servlet.context.tempdir" for javax
+factory.setRepository(repository);
+
+// Create a new file upload handler
+//JakartaServletDiskFileUpload upload = new JakartaServletDiskFileUpload(factory);
+수정==> ServletFileUpload upload = new ServletFileUpload(factory);
+
+// Parse the request
+// List<DiskFileItem> items = upload.parseRequest(request);
+수정==>  List<FileItem> items = upload.parseRequest(request);
+
+
+   나. Processing the uploaded items 내용 복사
+   //for (FileItem item : items.iterator()) {
+  수정==> 
+    Iterator<FileItem> iter = items.iterator();
+	// Process the uploaded items
+     while (iter.hasNext() ) {
+      FileItem item = iter.next();
+      if (item.isFormField()) {
+        //processFormField(item);
+      } else {
+        //processUploadedFile(item);
+      }
+}
+
+   다. type=text vs  type=file 분리해서 작업처리
+     if (item.isFormField()) {  // type="text" 처리
+	    String name = item.getFieldName();
+	    String value = item.getString();
+    
+     }else{      // type="file" 처리
+
+           String fieldName = item.getFieldName();
+String fileName = item.getName();
+String contentType = item.getContentType();
+boolean isInMemory = item.isInMemory();
+long sizeInBytes = item.getSize();
+     }
+
+
+   라. 진짜 파일 저장
+     File f = new File("c:\\upload", fileName) ;
+     try {
+       item.write(f);
+     } catch (Exception e) {
+	e.printStackTrace();
+     }
+
+######################################
+JSP ( Java Server Page )
+
+1. 특징: 
+   - *.jsp  ( hello.jsp )
+   - 저장경로는 html과 동일. ==> 이클립스의 webcontent 폴더에 저장
+   - 3단계로 동작된다.
+     가. 변환단계
+        hello.jsp -->  hello_jsp.java  ( 서블릿 매우 유사 )
+	jsp와 서블릿은 동일하다.
+
+     나. 컴파일 단계
+        hello_jsp.java --> hello_jsp.class ( 컴파일 에러가 발생될 수 있다. )
+
+     다. 실행 단계
+        hello_jsp.class ====> 실행결과는 html로 반환됨. ( 서블릿과 기능이 동일 )
+
+2. Model 1 Architecture
+   - 현재는 거의 사용 안함.
+   - jsp로만 웹 어플리케이션 개발하는 방법.
+
+    브라우저 <--------------> jsp ---> 서비스 --> dao -------> db
+                         (jsp에는 대부분이 화면처리(html)코드이다.
+			   자바의 로직처리는 잘 못하고 화면처리(html)를 잘함 )
+
+    브라우저 <--------------> 서블릿 ---> 서비스 --> dao -------> db
+                          (서블릿에는 대부분이 자바코드이다. 로직처리는 잘하지만 화면처리(html)를 잘 못함 )
+
+   Model 2 Architecture ( MVC )
+
+    브라우저 -------------> 서블릿 ---> 서비스 --> dao -------> db
+                           | (요청위임)
+          <------------   jsp        
+
+3. jsp 구성요소 ( 태그로 되어 있다. )
+  가. html 태그
+     - 주석 : <!--  주석  -->
+  나. jsp 태그 ( 교안 p97 )
+     - 주석 : <%-- 주석문 --%>
+     - directive tag :  
+            <%@ page  속성명=속성값 속성명=속성값 ...     %>
+            <%@ include  속성명=속성값 속성명=속성값 ...     %>
+	    <%@ taglib  속성명=속성값 속성명=속성값 ...     %>
+
+     - declaration tag:
+            <%! 자바코드  %>
+    
+     - scriptlet tag: (매우중요)
+            <% 자바코드  %>
+   
+     - expression tag:
+          <%= 변수  %>
+
+  =====> 자바코드를 사용한다. 화면을 꾸며주는 웹 디자이너에게는 매우 큰 문제였다.
+         해결: EL과 JSTL 이다.
+  다. EL ( Expression Language )- 매우 중요
+     - ${값}
+
+  라. JSTL ( Jsp Standard Tag Library ) - 매우 중요
+    - 커스텀 태그
+     예> <hello></hello>
+    - apache에서 개발자들이 많이 필요로 하는 커스텀 태그를 제공 ( library )
+      예> <c:if>
+         <c:foreach>
+	 ..
+##############################################################
+1) directive tag
+
+  가. page directive
+
+     문법: <%@ page  속성명="속성값" %>
+     기능: jsp에게 특정 설정정보를 지정할 때 사용됨.
+
+      contentType="text/html; charset=utf-8" ==> 한글 출력시 
+      서블릿의 response.setContentType("text/html; charset=utf-8") 동일 기능.
+
+      import="java.util.ArrayList,java.util.Date"==>jsp에서 사용하는 클래스의 패키지를 import할 때 사용.
+      일반적으로 여러번 사용한다.
+      <%@ page  import="java.util.ArrayList" %>
+      <%@ page  import="java.util.Date" %>
+
+       // 현재 jsp
+       errorPage="error.jsp"  ==> 현재 jsp파일에서 예외가 발생했을 때 처리하는 에러 페이지를 지정.
+        //error.jsp  
+       isErrorPage="true"   ==> 기본값 false, error.jsp 파일이 예외처리를 할 수 있는 jsp라고 지정하는 방법.
+
+
+       session="false"  ==> 기본은 true. false로 지정하면 HttpSession 사용 불가
+
+
+   나. include directive 
+     문법: <%@ include file="jsp파일" %> <== 지정된 위치에 'jsp파일' 내용으로 치환된다. 정적
+     용도: 화면 재사용
+
+
+      * JSP 액션 태그 이용한 include
+   <jsp:include  page="jsp파일" flush="true" /> <=지정된 위치에 'jsp파일'이 실행결과값으로 치환된다.동적
+
+
+    다. taglib directive
+     문법: <%@ taglib prefix=""  uri="" %>
+     용도: JSTL 사용됨
+
+
+2) declaration tag
+
+   - 거의 사용 안함
+   - 문법: <%! 자바코드   %>
+   - 서블릿의 doGet 제외한 멤버변수, 멤버메서드 동작
+
+     예>
+        public class TestServlet extends HttpServlet{
+
+	    int num = 10; // 멤버변수
+	    public void a(){} // 멤버 메서드
+
+            public void doGet(){
+
+	    }
+	}
+
+
+3) scriptlet tag: (매우중요)
+   - 가장 많이 사용됨
+   - 문법: <% 자바코드  %>
+   - 서블릿의 doGet(doPost)에서 했던 작업
+
+4) expression tag:
+   - 문법: <%= 변수  %>
+   - 변수값을 브라우저에 출력할 때 사용.
+     서블릿에서 out.print(변수) 동일 기능
+
+###########################################
+내장객체( 내장변수)
+- scriptlet tag 에서만 사용
+<%
+   // scriptlet tag에서는 
+   System.out.println("HttpServletRequest request 내장객체" + request);
+   System.out.println("HttpServletResponse response 내장객체" + response);
+   System.out.println("HttpSession session 내장객체" + session);
+   System.out.println("ServletContext application 내장객체" + application);
+   System.out.println("ServletConfig config 내장객체" + config);
+   System.out.println("PrintWriter out 내장객체" + out);
+%>
+- jsp가 java로 변환될 때 _jspService 메서드내에서 항상
+  내장변수를 미리 선언해둔다. 따라서 사용자는 내장변수를 선언없이 사용할 수 있다.
+  public void _jspService(final javax.servlet.http.HttpServletRequest request,
+        final javax.servlet.http.HttpServletResponse response){
+
+    final javax.servlet.jsp.PageContext pageContext;
+    javax.servlet.http.HttpSession session = null;
+    final javax.servlet.ServletContext application;
+    final javax.servlet.ServletConfig config;
+    javax.servlet.jsp.JspWriter out = null;
+    final java.lang.Object page = this;
+    javax.servlet.jsp.JspWriter _jspx_out = null;
+    javax.servlet.jsp.PageContext _jspx_page_context = null;
+
+  }
+
+  * 내장변수에서 추가로 정리
+   가. <%@ page session="false" %> 로 지정하면 내장변수 session을 사용하지 못한다.
+   나.  isErrorPage="true" 지정하면 예외처리할 수 있는 exception 내장변수가 추가된다.
+
+###########################################################################
+게시판 구축 프로젝트
+
+1. board 테이블 작성
+-- 게시판 테이블 작성
+
+create table board
+( num NUMBER(4) CONSTRAINT board_num_pk PRIMARY KEY,
+  title VARCHAR2(200) CONSTRAINT board_title_nn NOT NULL,
+  author VARCHAR2(20) CONSTRAINT board_author_nn NOT NULL,
+  content VARCHAR2(400),
+  writeday DATE DEFAULT SYSDATE,
+  readcnt NUMBER(4) DEFAULT 0 );
+  
+create sequence board_seq;  
+
+insert into board ( num, title, author, content )
+values ( board_seq.nextval , '테스트', '홍길동', '테스트입니다' );
+commit;
+ 
+2. 오라클 + mybatis 연동
+  ==> 프로젝트 생성후 WEB-INF/lib 폴더에 2개의 jar 복사
+
+3. 4가지 정보를 가진 jdbc.properties 작성 ( com.config 패키지)
+
+4. BoardMapper.xml 작성 ( com.config 패키지)
+    - 게시판 전체 목록 조회 기능
+
+5. BoardDTO.java 작성 ( com.dto 패키지 )
+
+6. Configuration.xml 작성 ( com.config 패키지)
+
+   - jdbc.properties 등록 및 ${} 설정
+   - BoardDTO 별칭
+   - BoardMapper.xml 등록
+
+7. MySqlSessionFactory.java 작성 ( com.config 패키지)
+ 
+   - Configuration.xml 지정해서 읽고
+   - SqlSession 반환
+################## 기본준비 완료 ##########
+전체적인 아키텍쳐 ( 목록보기 )
+
+          1)                          2)  BoardService       3)            4)
+브라우저 -----------> BoardListServlet ----> BoardServiceImpl ----> BoardDAO --> 오라클
+                                    <--                    <--            <--  
+				     (7)                   (6)           (5)
+                         | ( 8)요청위임)
+      <----------    list.jsp
+         9)
+
+반드시 지켜야될 규칙: jsp로 직접 요청하는 것은 금지한다. 반드시 서블릿으로 요청한다.
+               왜냐하면 jsp로 요청할 수 있지만 요청하면 Model 2 아키텍쳐(MVC)가 안된다.
+
+################## 기본준비 완료 ##########
+8. BoardDAO.java ( com.dao 패키지 )
+  - BoardServiceImpl에서 전달해준 SqlSession 과 파라미터(옵션)를 이용해서 실제 DB와 연동.
+
+
+9. BoardService.java 와 BoardServiceImpl.java 작성 ( com.service 패키지 )
+
+  - BoardDAO 메서드를 복사해서 SqlSession 파라미터를 제거한다.
+  - BoardDAO 연동
+
+10. BoardListServlet.java 작성 ( com.controller 패키지 )
+   - BoardService 연동해서 화면에 보여줄 데이터를 반환
+   - 반환된 데이터를 scope에 저장 
+       request scope
+       session scope
+       application scope
+
+   - jsp에 요청위임
+       forward
+       redirect
+
+11. list.jsp 작성
+    - BoardListServlet 에서 scope에 저장된 데이터를 얻어서 화면에 출력
+
+##############################################
+글쓰기 ( 글쓰기 화면보기 --> 글쓰기 )
+
+가. 글쓰기 화면보기
+브라우저  -----------> BoardWriteUIServlet
+                           |
+      <-----------      write.jsp
+
+
+나.  글쓰기
+                                         BoardService
+브라우저 --------> BoardWriteServlet <---> BoardServiceImpl <--> BoardDAO <---> DB
+                      |
+      <-----------  BoardListServlet(o)   list.jsp (X)
+
+ * post 요청에 대한 한글처리는 필터 이용 ==> request.setCharacterEncodig("utf-8");
+
+##############################################
+글자세히 보기 + 조회수 증가
+                                           BoardService
+브라우저 --------> BoardRetrieveServlet <---> BoardServiceImpl <--> BoardDAO <---> DB
+                      |
+      <-----------  retrieve.jsp 
+
+##############################################
+글 수정
+
+                                           BoardService
+브라우저 --------> BoardUpdateServlet <---> BoardServiceImpl <--> BoardDAO <---> DB
+                      |
+      <-----------   BoardListServlet(o) 
+
+##############################################
+글 삭제
+
+                                           BoardService
+브라우저 --------> BoardDeleteServlet <---> BoardServiceImpl <--> BoardDAO <---> DB
+                      |
+      <-----------   BoardListServlet(o) 
+
+##############################################
+글 검색
+
+브라우저 -----------> BoardListServlet ----> BoardServiceImpl ----> BoardDAO --> 오라클
+                                    <--                    <--            <--  
+				     (7)                   (6)           (5)
+                         | ( 8)요청위임)
+      <----------    list.jsp
+         9)
+
+##############################################################################
+JSP에서 사용가능한 태그
+1.html
+2.jsp 태그
+   <%@ page %>, <%@ include %> ,<%@ taglib %> 
+   <%! %>
+   <% %>
+   <%= %>
+3. EL ( Expression Language )
+4. JSTL
+##############################################################################
+EL ( Expression Language )
+
+가. 문법
+   ${표현식} ==> 표현식에 사용할 수 있는 것은 10(실제값) 또는 변수(scope에 setAttribue에서 사용된key값)
+   예> ${10}
+      ${10+3} //산술연산
+      ${10>3} //비교연산
+      ${10>3 && 4==3} //논리연산( &&, ||, ! )
+
+나. 동작: 브라우저에 출력된다.   
+다. 주요한 기능 (**********************)
+   - 서블릿에서 scope에 저장된 데이터를 웹 브라우저에서 매우 편리하게 출력할 수 있다.
+     서블릿 작업
+       request.setAttribute("userid","홍길동");
+     jsp 작업
+      <%
+         String userid = (String)request.getAttribute("userid");
+      %>
+      <%= userid %>
+
+      ==> 한번에 EL로 표기가 가능하다. ${userid}  ${scope에저장된key값}
+
+   - null값을 비어있는 값으로 처리한다. ==> NullPointerException 발생 안됨.
+   - null 여부 확인 방법 ${empty kkk}
+   - ${key}는 기본적으로 request scope에서 가져온다.
+          ${requestScope.key} 는 ${key}와 동일
+          ${sessionScope.key} 는 session scope에서 값을 가져온다.
+          ${applicationScope.key} 는 application scope에서 값을 가져온다.
+  
+   - DTO 저장한 경우에는 ${key.변수명} 형식을 사용한다.
+   - list 저장한 경우에는 ${key[idx].변수명} 형식을 사용한다.
+
+   ==> 주요한 특징은  조건 및 반복 처리 못함.
+     해결: JSTL
+##############################################################################
+JSTL ( Jsp Standard Tag Library )
+1. 개요: 사용자 태그(커스텀 태그) 사용이 가능하다.
+     예> <person></person>
+
+2. 자바의 웹 개발자가 실제로 jsp에서 필요한 사용자 태그를 만들어서 제공하고
+   그것을 사용하는 방법에 촛점을 맞춘다.
+
+3. 누가 제공?  아파치(apache)에서 무료로 제공.
+
+4. 사용 방법
+ 
+   가. apache 사이트에서 가서 필요한 jar 파일 다운로드후 압축 풀기
+    http://jakarta.apache.org
+
+   나. 압축푼 lib폴더의 2개의 jar 파일을  WEB-INF/lib 폴더에 복사하기
+      - jstl.jar
+      - standard.jar
+
+   다. 압축푼 폴더에서 standard-examples.war 찾아서 이클립스에서 import 한다.
+   라. import 한 프로젝트에서 index.html 요청한다.
+   마. 일반적으로 EL와 같이 사용된다. 
+
+5. Core 라이브러리
+   <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+
+  가. 브라우저에 값출력
+    ${scope에저장된key값}
+    <c:out value="${scope에저장된key값}" />
+
+  나. 변수 사용
+    <c:set var="변수명"   value="${scope에저장된key값}" scope="request|session|application"/>
+    ${변수명}
+ 
+  다. 조건 ( 단일 if 문 )
+   <c:if test="${조건식}">
+      문장
+   </c>
+    조건 ( choose 문 )
+   <c:choose>
+	   <c:when test="${조건식}">
+	      문장
+	   </c>
+	   <c:when test="${조건식}">
+	      문장
+	   </c>
+	   <c:otherwise></c:otherwise>
+   </c:choose>
+
+  라. 반복문
+    
+    1) range
+
+      <c:foreach  var="변수명"  begin="시작값" end="끝값">
+          ${변수명} 문장
+      </c:foreach>
+  
+    2) scope에 저장된 데이터 반복
+        <h2>2. List 반복(****)</h2>
+	<c:forEach var="dto"  items="${list}">
+	   ${dto.userid}&nbsp;${dto.passwd}<br>
+	</c:forEach>
+	<h2>2. List 반복2- idx 얻기</h2>
+	<c:forEach var="dto"  items="${list}" varStatus="status">
+	   ${status.index},${status.count},${status.first}
+	   , ${status.last},${dto.userid}<br>
+	</c:forEach>
+
+
+  마. url (*************)
+    이전 경로:
+      <a href="JSTLServlet">상대경로</a>
+      <a href="/컨텍스트명/JSTLServlet">절대경로</a>
+
+    - <c:url value="경로" />
+      절대경로 가능. /만 붙여주면 자동으로 컨텍스트명을 추가해준다.
+      상대경로 가능.
+
+ 
+
+
+##############################################################################
+ShopMiniMall 프로젝트
+
+1. DB에 shop 계정 생성
+  -- 관리자
+  create user shop
+  identified by shop;
+
+  grant resource, connect
+  to shop;
+
+ 나중에 shop 계정에서 필요한 테이블 생성한다.
+
+2. 웹 프로젝트 생성 ( ShopMiniMall)
+
+3. 메인화면
+
+ 브라우저 -------->MainServlet (/main)
+                    |
+                 main.jsp
+
+
+4. 회원가입화면 보기
+
+브라우저 -------->MemberUIServlet (/MemberUIServlet)
+                    |
+                 memberForm.jsp
+
+ 5. member 테이블 작성
+
+   -- shop 계정
+   create table member
+   ( userid varchar2(20) CONSTRAINT member_userid_pk PRIMARY KEY,
+     passwd varchar2(20) not null,
+     username varchar2(20) not null,
+     post varchar2(6) not null,
+     addr1 varchar2(500) not null,
+     addr2 varchar2(500) not null,
+     phone1 varchar2(3) not null,
+     phone2 varchar2(4) not null,
+     phone3 varchar2(4) not null,
+     email1 varchar2(20) not null,
+     email2 varchar2(20) not null
+    );
+
+6. 아이디 중복 검사 ( Ajax ==> 화면갱신 안됨 )
+   ##############################
+     가. 4개의 jar WEB-INF/lib 폴더에 복사
+          -ojdbc6_g.jar, mybatis.jar, jstl.jar, standard.jar
+     나. com.dto.MemberDTO.java
+     다. jdbc.properties
+        Configuration.xml
+        MemberMapper.xml
+	MySqlSessionFactory.java
+
+
+    ##############################
+               (/MemberIdCheckServlet)      MemberService
+브라우저 -------->MemberIdCheckServlet <------> MemberServiceImpl <---> MemberDAO <-->DB
+      <-------    if(dto!=null)                                MemberDTO
+       가능/불가             
+                
+
+7. 회원가입
+
+               (/MemberAddServlet)      MemberService
+브라우저 -------->MemberAddServlet <------> MemberServiceImpl <---> MemberDAO <-->DB
+                        |                        MemberDTO
+     <--------    LoginUIServlet (로그인 화면)
+                
+     method="post" 했기 때문에 post 방식의 한글처리해야 된다. Filter 사용
+
+8. 로그인 화면보기
+
+브라우저 --------> LoginUIServlet (/LoginUIServlet)
+                    |
+                 loginForm.jsp
+
+
+9. 로그인
+
+               (/LoginServlet)      MemberService
+브라우저 -------->  LoginServlet <------> MemberServiceImpl <---> MemberDAO <-->DB
+                        |                        MemberDTO
+     <--------         메인화면
+
+10. 로그아웃 ( 로그인 이후의 작업이기 때문에 로그인 여부를 확인해야 된다. )
+
+브라우저 --------> LogOutServlet (/LogOutServlet)
+                    |
+      <--------   메인화면
+
+
+11. mypage ( 로그인 이후의 작업이기 때문에 로그인 여부를 확인해야 된다. )
+
+
+                  (/MyPageServlet)      MemberService
+브라우저 -------->  MyPageServlet <------> MemberServiceImpl <---> MemberDAO <-->DB
+                        |                        MemberDTO
+     <--------       mypage.jsp
+
+
+   * 로그인 여부 확인 방법
+		  HttpSession session = request.getSession();
+		  MemberDTO dto =
+				  (MemberDTO)session.getAttribute("login");
+		  
+		 String nextPage = null; 
+		 if(dto!=null) { 
+		    //로그인 한 경우
+			 
+			 
+			 nextPage = "";
+		 }else {
+		   // 로그인 안했거나 했는데 time-out된 경우	 
+			nextPage = "member/checkLogin.jsp";
+		 }
+		 response.sendRedirect(nextPage);
+
+12. 상품목록 구현
+
+   가. 상품테이블 작성 - goods 테이블
+   나. com.dto.GoodsDTO.java 
+   다. GoodsMapper.xml  ==> 반드시 Configuration.xml 등록
+
+              (/main)               GoodsService
+브라우저 -------->MainServlet <------> GoodsServiceImpl <---> GoodsDAO <-->DB
+                        |                        GoodsDTO
+     <--------    main.jsp
+
+13. 상품 자세히보기
+
+              (/GoodsRetrieveServlet)        GoodsService
+브라우저 -------->GoodsRetrieveServlet <------> GoodsServiceImpl <---> GoodsDAO <-->DB
+                        |                        GoodsDTO
+     <--------    goodsRetrieve.jsp
+
+    * 수량 증가 - jQuery 로 구현
+   
+14. 장바구니 담기
+
+    가. cart 테이블 작성
+    나. CartDTO.java 작성
+    다. CartMapper.xml 추가하고 Configuration.xml 등록
+
+
+             (/CartAddServlet)         CartService
+브라우저 -------->CartAddServlet <------> CartServiceImpl <---> CartDAO <-->DB
+                        |                        CartDTO
+     <--------        main
+
+
+14. 장바구니 목록
+
+              (/CartListServlet)        CartService
+브라우저 -------->CartListServlet <------> CartServiceImpl <---> CartDAO <-->DB
+                        |                        CartDTO
+     <--------    cartList.jsp
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.0/jquery.min.js"></script> 
+<script>
+   $(document).ready(function(){
+	   
+	   
+   });
+ </script>
+
+15. 장바구니 수량 변경 - ajax
+
+               (/CartUpdateServlet)      CartService
+브라우저 --------> CartUpdateServlet <------> CartServiceImpl <---> CartDAO <-->DB
+      <-------                                   CartDTO
+       
+
+16. 장바구니 단일 삭제
+
+             (/CartDeleteServlet)         CartService
+브라우저 -------->CartDeleteServlet <------> CartServiceImpl <---> CartDAO <-->DB
+                        |                        CartDTO
+     <--------   CartListServlet
+
+17. 장바구니 전체 삭제
+
+             (/CartDeleteAllServlet)         CartService
+브라우저 -------->CartDeleteAllServlet <------> CartServiceImpl <---> CartDAO <-->DB
+                        |                        CartDTO
+     <--------   CartListServlet
+
+
+18. 주문
+
+             (/OrderConfirmServlet)         OrderService
+브라우저 -------->OrderConfirmServlet <------> OrderServiceImpl <---> OrderDAO <-->DB
+                        |                        OrderDTO
+     <--------   orderConfirm.jsp
+
+    
+     가. orderinfo 테이블
+     나. OrderDTO.java
+     다. OrderMapper.xml 추가하고 Configuration.xml 등록
+
+19. 결제
+
+             (/OrderDoneServlet)         OrderService
+브라우저 -------->OrderDoneServlet <------> OrderServiceImpl <---> OrderDAO <-->DB
+                        |                        OrderDTO
+     <--------   orderDone.jsp
+
+   
+   * 결제하면 OrderInfo에 저장(insert)되고 Cart 에서는 삭제(delete)가 되어야 된다. ( 트랜잭션 )
+     
+    
